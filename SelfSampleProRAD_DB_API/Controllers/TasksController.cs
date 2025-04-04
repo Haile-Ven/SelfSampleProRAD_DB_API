@@ -1,0 +1,155 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SelfSampleProRAD_DB.Model;
+using SelfSampleProRAD_DB.DTOs;
+using SelfSampleProRAD_DB_API.Data;
+
+namespace SelfSampleProRAD_DB.Controller
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class TasksController : ControllerBase
+    {
+        private readonly AppDbContext _context;
+        public TasksController(AppDbContext context)
+        {
+            _context = context;
+        }
+        /// <summary>
+        /// Assign a new task
+        /// </summary>
+        [HttpPost]
+        public async Task<ActionResult<EmployeeTasks>> AssignTask([FromBody] AssignTaskDTO request)
+        {
+            using var transaction = _context.Database.BeginTransaction();
+            try
+            {
+                var task = new Tasks
+                {
+                    TaskName = request.TaskName,
+                    Status = 'P'
+                };
+                var taskResponse = _context.Tasks.Add(task);
+                await _context.SaveChangesAsync();
+                var employeeTask = new EmployeeTasks
+                {
+                    TaskId = taskResponse.Entity.TaskId,
+                    AssignedToId = request.AssignedToId,
+                    AssignedById = request.AssignedById
+                };
+                var employeeTaskResponse = _context.EmployeeTasks.Add(employeeTask);
+                await _context.SaveChangesAsync();
+                transaction.Commit();
+                return Ok(new { Data = employeeTask, Message = "Task Successfully assigned" });
+            } catch (Exception ex) { 
+                return StatusCode(500, "Error: " + ex.Message); 
+            }
+        }
+
+        private static string GetStatusText(char status)
+        {
+            if (status == 'P') return "Pending";
+            if (status == 'S') return "Started";
+            if (status == 'C') return "Completed";
+            return "Unknown";
+        }
+
+        /// <summary>
+        /// View tasks assigned to an employee
+        /// </summary>
+        [HttpGet("assigned-to/{taskTo}")]
+        public async Task<ActionResult<List<TaskViewToResponseDTO>>> ViewTasksFor(Guid taskTo)
+        {
+            try
+            {
+                var tasks = await _context.EmployeeTasks
+                    .Where(t => t.AssignedToId == taskTo && t.Tasks.Status !='C')
+                    .Select(t => new TaskViewToResponseDTO
+                    {
+                        TaskId = t.TaskId,
+                        FirstName = t.AssignedBy.FirstName,
+                        LastName = t.AssignedBy.LastName,
+                        TaskName = t.Tasks.TaskName,
+                        Status = GetStatusText(t.Tasks.Status)
+                    })
+                    .ToListAsync();
+                return Ok(tasks);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Error: " + (ex.InnerException?.Message ?? ex.Message));
+            }
+        }
+
+        /// <summary>
+        /// View tasks assigned by an employee
+        /// </summary>
+        [HttpGet("assigned-by/{taskBy}")]
+        public async Task<ActionResult<List<TaskViewByResponseDTO>>> ViewTasksBy(Guid taskBy)
+        {
+            try
+            {
+                var tasks = await _context.EmployeeTasks
+                    .Where(t => t.AssignedById == taskBy)
+                    .Select(t => new TaskViewByResponseDTO
+                    {
+                        FullName = $"{t.AssignedTo.FirstName} {t.AssignedTo.LastName}",
+                        TaskName = t.Tasks.TaskName,
+                        Status = GetStatusText(t.Tasks.Status)
+                    })
+                    .ToListAsync();
+                return Ok(tasks);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Error: " + (ex.InnerException?.Message ?? ex.Message));
+            }
+        }
+
+        /// <summary>
+        /// Start working on a task
+        /// </summary>
+        [HttpPut("{taskId}/start")]
+        public async Task<ActionResult> startWorking(Guid taskId)
+        {
+            var task = await _context.Tasks
+                .Where(t => t.TaskId == taskId).FirstOrDefaultAsync();
+            if (task == null) return NotFound("Task not found.");
+            if (task.Status == 'C') return BadRequest("Task is already completed.");
+            task.Status = 'S';
+            try
+            {
+                _context.Update(task);
+                await _context.SaveChangesAsync();
+                return Ok("Task started.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Error: " + ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Complete a task
+        /// </summary>
+        [HttpPut("{taskId}/complete")]
+        public async Task<ActionResult> submitWork(Guid taskId)
+        {
+            var task = await _context.Tasks
+                .Where(t => t.TaskId == taskId).FirstOrDefaultAsync();
+            if (task == null) return NotFound("Task not found.");
+            if (task.Status == 'C') return BadRequest("Task is already completed.");
+            task.Status = 'C';
+            try
+            {
+                _context.Update(task);
+                await _context.SaveChangesAsync();
+                return Ok("Task completed.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Error: " + ex.Message);
+            }
+        }
+    }
+}

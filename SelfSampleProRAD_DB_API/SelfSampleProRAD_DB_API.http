@@ -1,0 +1,6 @@
+@SelfSampleProRAD_DB_API_HostAddress = http://localhost:5192
+
+GET {{SelfSampleProRAD_DB_API_HostAddress}}/SelfSampleProRAD_DB_API/
+Accept: application/json
+
+###
