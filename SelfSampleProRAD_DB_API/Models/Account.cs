@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace SelfSampleProRAD_DB.Model
+namespace SelfSampleProRAD_DB_API.Model
 {
     public class Account
     {

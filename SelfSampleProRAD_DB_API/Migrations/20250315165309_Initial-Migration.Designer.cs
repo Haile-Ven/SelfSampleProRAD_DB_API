@@ -9,7 +9,7 @@ using SelfSampleProRAD_DB_API.Data;
 
 #nullable disable
 
-namespace SelfSampleProRAD_DB.Migrations
+namespace SelfSampleProRAD_DB_API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     [Migration("20250315165309_Initial-Migration")]

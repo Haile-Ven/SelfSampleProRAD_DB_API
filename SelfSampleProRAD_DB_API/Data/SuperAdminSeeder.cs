@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using SelfSampleProRAD_DB.Model;
+using SelfSampleProRAD_DB_API.Model;
 namespace SelfSampleProRAD_DB_API.Data
 {
     public class SuperAdminSeeder

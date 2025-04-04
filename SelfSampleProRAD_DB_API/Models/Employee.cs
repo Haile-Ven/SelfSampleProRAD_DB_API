@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SelfSampleProRAD_DB.Model
+namespace SelfSampleProRAD_DB_API.Model
 {
     public class Employee
     {

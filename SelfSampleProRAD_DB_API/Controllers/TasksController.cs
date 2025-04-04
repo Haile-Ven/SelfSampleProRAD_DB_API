@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SelfSampleProRAD_DB.Model;
-using SelfSampleProRAD_DB.DTOs;
+using SelfSampleProRAD_DB_API.Model;
+using SelfSampleProRAD_DB_API.DTOs;
 using SelfSampleProRAD_DB_API.Data;
 
-namespace SelfSampleProRAD_DB.Controller
+namespace SelfSampleProRAD_DB_API.Controller
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -34,8 +34,8 @@ namespace SelfSampleProRAD_DB.Controller
                 var employeeTask = new EmployeeTasks
                 {
                     TaskId = taskResponse.Entity.TaskId,
-                    AssignedToId = request.AssignedToId,
-                    AssignedById = request.AssignedById
+                    AssignedToId = Guid.Parse(request.AssignedToId),
+                    AssignedById = Guid.Parse(request.AssignedById)
                 };
                 var employeeTaskResponse = _context.EmployeeTasks.Add(employeeTask);
                 await _context.SaveChangesAsync();

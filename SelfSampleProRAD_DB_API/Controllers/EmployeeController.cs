@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SelfSampleProRAD_DB.DTOs;
-using SelfSampleProRAD_DB.Model;
+using SelfSampleProRAD_DB_API.DTOs;
+using SelfSampleProRAD_DB_API.Model;
 using SelfSampleProRAD_DB_API.Data;
 using System.Threading.Tasks;
 
-namespace SelfSampleProRAD_DB.Controller
+namespace SelfSampleProRAD_DB_API.Controller
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -49,7 +49,7 @@ namespace SelfSampleProRAD_DB.Controller
                 _context.Employee.Add(newEmployee);
                 await _context.SaveChangesAsync(); // Saves and generates EmployeeId
 
-                var userName = $"{newEmployee.LastName}_{newEmployee.FirstName}@{newEmployee.EmployeeId.ToString().Substring(0,3)}";
+                var userName = $"{newEmployee.LastName}_{newEmployee.FirstName}@{newEmployee.EmployeeId.ToString().Substring(0, 3)}";
                 var account = new Account
                 {
                     UserName = userName,
@@ -77,13 +77,13 @@ namespace SelfSampleProRAD_DB.Controller
         /// <summary>
         /// Update an existing employee
         /// </summary>
-        [HttpPut]
-        public async Task<ActionResult> UpdateEmployee([FromBody] EmployeeEditDTO employee)
+        [HttpPut("{employeeId}")]
+        public async Task<ActionResult> UpdateEmployee(Guid employeeID, [FromBody] EmployeeEditDTO employee)
         {
             bool IsNameChanged = false;
             try
             {
-                var emp = await _context.Employee.Where(e => e.EmployeeId == employee.EmployeeId).FirstOrDefaultAsync();
+                var emp = await _context.Employee.Where(e => e.EmployeeId == employeeID).FirstOrDefaultAsync();
                 if (emp == null) return NotFound("Employee not found.");
                 if (emp.FirstName == employee.FirstName || emp.LastName == employee.LastName) IsNameChanged = true;
                 emp.FirstName = employee.FirstName;
@@ -95,7 +95,7 @@ namespace SelfSampleProRAD_DB.Controller
                 if (IsNameChanged)
                 {
                     var account = await _context.Account.Where(a => a.UserId == emp.UserId).FirstOrDefaultAsync();
-                    account.UserName = $"{emp.LastName}_{emp.FirstName}@{employee.EmployeeId.ToString().Substring(0, 3)}";
+                    account.UserName = $"{emp.LastName}_{emp.FirstName}@{employeeID.ToString().Substring(0, 3)}";
                     _context.Account.Update(account);
                     await _context.SaveChangesAsync();
                 }
@@ -161,6 +161,23 @@ namespace SelfSampleProRAD_DB.Controller
                 return NotFound();
                 
             return Ok(employee);
+        }
+
+        /// <summary>
+        /// List all developers
+        /// </summary>
+        [HttpGet("developers")]
+        public async Task<ActionResult<List<DevEmployeeResponseDTO>>> ListAllDevs()
+        {
+            var devs = await _context.Employee
+                .Where(a => a.Position == "Developer")
+                .Select(a => new DevEmployeeResponseDTO()
+                {
+                    EmployeeID = a.EmployeeId,
+                    FullName = $"{a.FirstName} {a.LastName}"
+                })
+                .ToListAsync();
+            return Ok(devs);
         }
 
         /// <summary>

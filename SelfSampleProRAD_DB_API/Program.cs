@@ -71,11 +71,7 @@ namespace SelfSampleProRAD_DB_API
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
-                app.UseSwaggerUI(c => 
-                {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1");
-                    c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
-                });
+                app.UseSwaggerUI();
             }
 
             // Configure forwarded headers

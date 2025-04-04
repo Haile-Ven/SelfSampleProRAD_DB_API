@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SelfSampleProRAD_DB.DTOs;
-using SelfSampleProRAD_DB.Model;
+using SelfSampleProRAD_DB_API.DTOs;
+using SelfSampleProRAD_DB_API.Model;
 using SelfSampleProRAD_DB_API.Data;
 using System.Threading.Tasks;
 
-namespace SelfSampleProRAD_DB.Controller
+namespace SelfSampleProRAD_DB_API.Controller
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -99,24 +99,6 @@ namespace SelfSampleProRAD_DB.Controller
                 })
                 .ToListAsync();
             return Ok(accounts);
-        }
-
-        /// <summary>
-        /// List all developer accounts
-        /// </summary>
-        [HttpGet("developers")]
-        public async Task<ActionResult<List<AccountResponseDTO>>> ListAllDevs()
-        {
-            var devs = await _context.Account
-                .Where(a => a.Employee.Position == "Developer")
-                .Select(a => new AccountResponseDTO()
-                {
-                    UserId = a.UserId,
-                    UserName = a.UserName,
-                    Status = a.Status,
-                })
-                .ToListAsync();
-            return Ok(devs);
         }
 
         /// <summary>

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SelfSampleProRAD_DB.Model
+namespace SelfSampleProRAD_DB_API.Model
 {
     public class Tasks
     {
@@ -14,6 +14,6 @@ namespace SelfSampleProRAD_DB.Model
 
         public virtual ICollection<EmployeeTasks> EmployeeTasks { get; set; }
         //Constructors
-        public Tasks() { TaskId = new Guid(); }
+        public Tasks() { TaskId = Guid.NewGuid(); }
     }
 }

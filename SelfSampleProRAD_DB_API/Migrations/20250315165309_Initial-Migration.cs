@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace SelfSampleProRAD_DB.Migrations
+namespace SelfSampleProRAD_DB_API.Migrations
 {
     /// <inheritdoc />
     public partial class InitialMigration : Migration

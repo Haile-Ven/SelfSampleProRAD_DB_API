@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SelfSampleProRAD_DB.DTOs
+namespace SelfSampleProRAD_DB_API.DTOs
 {
     public class LoginRequestDTO
     {
@@ -55,10 +55,10 @@ namespace SelfSampleProRAD_DB.DTOs
         public string TaskName { get; set; }
         
         [Required]
-        public Guid AssignedToId { get; set; }
+        public string AssignedToId { get; set; }
         
         [Required]
-        public Guid AssignedById { get; set; }
+        public string AssignedById { get; set; }
     }
 
     public class AccountResponseDTO
@@ -66,6 +66,12 @@ namespace SelfSampleProRAD_DB.DTOs
         public Guid UserId { get; set; }
         public string UserName { get; set; }
         public char Status { get; set; }
+    }
+
+    public class DevEmployeeResponseDTO
+    {
+        public Guid EmployeeID { get; internal set; }
+        public string FullName { get; internal set; }
     }
 
     public class EmployeeResponseDTO
@@ -84,7 +90,6 @@ namespace SelfSampleProRAD_DB.DTOs
 
     public class EmployeeEditDTO
     {
-        public Guid EmployeeId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public char Gender { get; set; }
