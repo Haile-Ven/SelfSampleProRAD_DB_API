@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SelfSampleProRAD_DB_API.Model
+namespace SelfSampleProRAD_DB_API.Models
 {
     public class Tasks
     {

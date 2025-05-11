@@ -1,13 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SelfSampleProRAD_DB_API.Model;
+using SelfSampleProRAD_DB_API.Models;
 using SelfSampleProRAD_DB_API.DTOs;
 using SelfSampleProRAD_DB_API.Data;
+using Microsoft.AspNetCore.Authorization;
 
-namespace SelfSampleProRAD_DB_API.Controller
+namespace SelfSampleProRAD_DB_API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize] // Base authorization for all endpoints
     public class TasksController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -19,6 +21,7 @@ namespace SelfSampleProRAD_DB_API.Controller
         /// Assign a new task
         /// </summary>
         [HttpPost]
+        [Authorize(Policy = "RequireManager")] // Only managers can assign tasks
         public async Task<ActionResult<EmployeeTasks>> AssignTask([FromBody] AssignTaskDTO request)
         {
             using var transaction = _context.Database.BeginTransaction();
@@ -58,6 +61,7 @@ namespace SelfSampleProRAD_DB_API.Controller
         /// View tasks assigned to an employee
         /// </summary>
         [HttpGet("assigned-to/{taskTo}")]
+        [Authorize(Policy = "RequireEmployee")] // Any employee can view tasks assigned to them
         public async Task<ActionResult<List<TaskViewToResponseDTO>>> ViewTasksFor(Guid taskTo)
         {
             try
@@ -85,6 +89,7 @@ namespace SelfSampleProRAD_DB_API.Controller
         /// View tasks assigned by an employee
         /// </summary>
         [HttpGet("assigned-by/{taskBy}")]
+        [Authorize(Policy = "RequireManager")] // Only managers can view tasks they assigned
         public async Task<ActionResult<List<TaskViewByResponseDTO>>> ViewTasksBy(Guid taskBy)
         {
             try
@@ -110,6 +115,7 @@ namespace SelfSampleProRAD_DB_API.Controller
         /// Start working on a task
         /// </summary>
         [HttpPut("{taskId}/start")]
+        [Authorize(Policy = "RequireDeveloper")] // Only developers can start working on tasks
         public async Task<ActionResult> startWorking(Guid taskId)
         {
             var task = await _context.Tasks
@@ -133,6 +139,7 @@ namespace SelfSampleProRAD_DB_API.Controller
         /// Complete a task
         /// </summary>
         [HttpPut("{taskId}/complete")]
+        [Authorize(Policy = "RequireDeveloper")] // Only developers can complete tasks
         public async Task<ActionResult> submitWork(Guid taskId)
         {
             var task = await _context.Tasks

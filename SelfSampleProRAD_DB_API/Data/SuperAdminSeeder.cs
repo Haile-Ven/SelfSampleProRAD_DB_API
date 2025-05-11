@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using SelfSampleProRAD_DB_API.Model;
+using SelfSampleProRAD_DB_API.Models;
 namespace SelfSampleProRAD_DB_API.Data
 {
     public class SuperAdminSeeder
@@ -16,7 +16,7 @@ namespace SelfSampleProRAD_DB_API.Data
 
         public async Task SeedSuperAdminAsync()
         {
-            var superAdminUserName = "SuperAdmin@001";
+            var superAdminUserName = "Doe_John@111";
 
             // Check if super admin exists by the static EmployeeId
             if (await _context.Employee.AnyAsync(e => e.EmployeeId == SuperAdminEmployeeId))
@@ -32,7 +32,7 @@ namespace SelfSampleProRAD_DB_API.Data
                     Gender = 'M',
                     Age = 35,
                     Position = "Admin",
-                    Catagory = "Permanent",
+                    Category = "Permanent",
                     Salary = 50000,
                     Tax = 5000
                 };
@@ -44,7 +44,7 @@ namespace SelfSampleProRAD_DB_API.Data
                 {
                     UserId = SuperAdminUserId,  // Use the static UserId
                     UserName = superAdminUserName,
-                    Password = "P@55w0rd123456",
+                    Password = "p@55w0rd",
                     Status = 'A'
                 };
 

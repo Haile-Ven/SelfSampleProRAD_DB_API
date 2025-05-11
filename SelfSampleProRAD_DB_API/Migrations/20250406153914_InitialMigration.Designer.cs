@@ -12,7 +12,7 @@ using SelfSampleProRAD_DB_API.Data;
 namespace SelfSampleProRAD_DB_API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250315165309_Initial-Migration")]
+    [Migration("20250406153914_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -20,12 +20,12 @@ namespace SelfSampleProRAD_DB_API.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.2")
+                .HasAnnotation("ProductVersion", "9.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("SelfSampleProRAD_DB.Model.Account", b =>
+            modelBuilder.Entity("SelfSampleProRAD_DB_API.Models.Account", b =>
                 {
                     b.Property<Guid>("UserId")
                         .ValueGeneratedOnAdd()
@@ -48,7 +48,7 @@ namespace SelfSampleProRAD_DB_API.Migrations
                     b.ToTable("Account");
                 });
 
-            modelBuilder.Entity("SelfSampleProRAD_DB.Model.Employee", b =>
+            modelBuilder.Entity("SelfSampleProRAD_DB_API.Models.Employee", b =>
                 {
                     b.Property<Guid>("EmployeeId")
                         .ValueGeneratedOnAdd()
@@ -57,7 +57,7 @@ namespace SelfSampleProRAD_DB_API.Migrations
                     b.Property<byte>("Age")
                         .HasColumnType("tinyint");
 
-                    b.Property<string>("Catagory")
+                    b.Property<string>("Category")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -95,7 +95,7 @@ namespace SelfSampleProRAD_DB_API.Migrations
                     b.ToTable("Employee");
                 });
 
-            modelBuilder.Entity("SelfSampleProRAD_DB.Model.EmployeeTasks", b =>
+            modelBuilder.Entity("SelfSampleProRAD_DB_API.Models.EmployeeTasks", b =>
                 {
                     b.Property<Guid>("ETID")
                         .ValueGeneratedOnAdd()
@@ -126,7 +126,7 @@ namespace SelfSampleProRAD_DB_API.Migrations
                     b.ToTable("EmployeeTasks");
                 });
 
-            modelBuilder.Entity("SelfSampleProRAD_DB.Model.Tasks", b =>
+            modelBuilder.Entity("SelfSampleProRAD_DB_API.Models.Tasks", b =>
                 {
                     b.Property<Guid>("TaskId")
                         .ValueGeneratedOnAdd()
@@ -145,34 +145,34 @@ namespace SelfSampleProRAD_DB_API.Migrations
                     b.ToTable("Tasks");
                 });
 
-            modelBuilder.Entity("SelfSampleProRAD_DB.Model.Employee", b =>
+            modelBuilder.Entity("SelfSampleProRAD_DB_API.Models.Employee", b =>
                 {
-                    b.HasOne("SelfSampleProRAD_DB.Model.Account", "Account")
+                    b.HasOne("SelfSampleProRAD_DB_API.Models.Account", "Account")
                         .WithOne("Employee")
-                        .HasForeignKey("SelfSampleProRAD_DB.Model.Employee", "UserId");
+                        .HasForeignKey("SelfSampleProRAD_DB_API.Models.Employee", "UserId");
 
                     b.Navigation("Account");
                 });
 
-            modelBuilder.Entity("SelfSampleProRAD_DB.Model.EmployeeTasks", b =>
+            modelBuilder.Entity("SelfSampleProRAD_DB_API.Models.EmployeeTasks", b =>
                 {
-                    b.HasOne("SelfSampleProRAD_DB.Model.Employee", "AssignedBy")
+                    b.HasOne("SelfSampleProRAD_DB_API.Models.Employee", "AssignedBy")
                         .WithMany()
                         .HasForeignKey("AssignedById")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("SelfSampleProRAD_DB.Model.Employee", "AssignedTo")
+                    b.HasOne("SelfSampleProRAD_DB_API.Models.Employee", "AssignedTo")
                         .WithMany()
                         .HasForeignKey("AssignedToId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("SelfSampleProRAD_DB.Model.Employee", null)
+                    b.HasOne("SelfSampleProRAD_DB_API.Models.Employee", null)
                         .WithMany("EmployeeTasks")
                         .HasForeignKey("EmployeeId");
 
-                    b.HasOne("SelfSampleProRAD_DB.Model.Tasks", "Tasks")
+                    b.HasOne("SelfSampleProRAD_DB_API.Models.Tasks", "Tasks")
                         .WithMany("EmployeeTasks")
                         .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -185,18 +185,18 @@ namespace SelfSampleProRAD_DB_API.Migrations
                     b.Navigation("Tasks");
                 });
 
-            modelBuilder.Entity("SelfSampleProRAD_DB.Model.Account", b =>
+            modelBuilder.Entity("SelfSampleProRAD_DB_API.Models.Account", b =>
                 {
                     b.Navigation("Employee")
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SelfSampleProRAD_DB.Model.Employee", b =>
+            modelBuilder.Entity("SelfSampleProRAD_DB_API.Models.Employee", b =>
                 {
                     b.Navigation("EmployeeTasks");
                 });
 
-            modelBuilder.Entity("SelfSampleProRAD_DB.Model.Tasks", b =>
+            modelBuilder.Entity("SelfSampleProRAD_DB_API.Models.Tasks", b =>
                 {
                     b.Navigation("EmployeeTasks");
                 });

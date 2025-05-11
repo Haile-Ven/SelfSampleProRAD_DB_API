@@ -1,5 +1,9 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using SelfSampleProRAD_DB_API.Data;
+using SelfSampleProRAD_DB_API.Services;
+using System.Text;
 
 namespace SelfSampleProRAD_DB_API
 {
@@ -42,6 +46,31 @@ namespace SelfSampleProRAD_DB_API
 
             // Add HttpContextAccessor
             builder.Services.AddHttpContextAccessor();
+
+            // Add JWT Authentication
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "SelfSampleProRAD_DB_API",
+                        ValidAudience = builder.Configuration["Jwt:Audience"] ?? "SelfSampleProRAD_DB_API_Users",
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? "DefaultSecretKey12345678901234567890"))
+                    };
+                });
+
+            // Add Authorization Policies
+            builder.Services.AddAuthorization(options =>
+            {
+                AuthorizationPolicies.ConfigurePolicies(options);
+            });
+
+            // Add JWT Service
+            builder.Services.AddScoped<JwtService>();
 
             // Add DbContext with explicit connection string to avoid environment variable override
             var sqlServerConnectionString = "Data Source=HAILE-WORK;Initial Catalog=EmployeeTaskDB;Integrated Security=True;Encrypt=True;Trust Server Certificate=True";
@@ -89,7 +118,11 @@ namespace SelfSampleProRAD_DB_API
 
             // Use CORS before auth
             app.UseCors("AllowAll");
+            
+            // Add authentication middleware before authorization
+            app.UseAuthentication();
             app.UseAuthorization();
+            
             app.MapControllers();
             await app.RunAsync();
         }

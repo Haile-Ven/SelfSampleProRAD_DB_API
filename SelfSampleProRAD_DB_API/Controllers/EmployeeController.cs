@@ -1,14 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SelfSampleProRAD_DB_API.DTOs;
-using SelfSampleProRAD_DB_API.Model;
+using SelfSampleProRAD_DB_API.Models;
 using SelfSampleProRAD_DB_API.Data;
+using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
 
-namespace SelfSampleProRAD_DB_API.Controller
+namespace SelfSampleProRAD_DB_API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize] // Base authorization for all endpoints
     public class EmployeeController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -22,6 +24,7 @@ namespace SelfSampleProRAD_DB_API.Controller
         /// Add a new employee
         /// </summary>
         [HttpPost]
+        [Authorize(Policy = "RequireAdmin")] // Only admins can add employees
         public async Task<ActionResult> AddEmployee([FromBody] AddEmployeeDTO employee)
         {
             float salary;
@@ -43,7 +46,7 @@ namespace SelfSampleProRAD_DB_API.Controller
                     Position = employee.Position,
                     Salary = salary,
                     Tax = tax,
-                    Catagory = employee.Category
+                    Category = employee.Category
                 };
 
                 _context.Employee.Add(newEmployee);
@@ -78,6 +81,7 @@ namespace SelfSampleProRAD_DB_API.Controller
         /// Update an existing employee
         /// </summary>
         [HttpPut("{employeeId}")]
+        [Authorize(Policy = "RequireManager")] // Only managers can update employees
         public async Task<ActionResult> UpdateEmployee(Guid employeeID, [FromBody] EmployeeEditDTO employee)
         {
             bool IsNameChanged = false;
@@ -111,6 +115,7 @@ namespace SelfSampleProRAD_DB_API.Controller
         /// Get employee by ID
         /// </summary>
         [HttpGet("{employeeId}")]
+        [Authorize(Policy = "RequireEmployee")] // Any employee can view employee details
         public async Task<ActionResult<Employee>> SelectEmployee(Guid employeeId)
         {
             var employee = await _context.Employee
@@ -125,7 +130,7 @@ namespace SelfSampleProRAD_DB_API.Controller
                     Position = e.Position,
                     Salary = e.Salary,
                     Tax = e.Tax,
-                    Catagory = e.Catagory,
+                    Category = e.Category,
                     Account = e.Account
                 }).FirstOrDefaultAsync();
                 
@@ -139,6 +144,7 @@ namespace SelfSampleProRAD_DB_API.Controller
         /// Get employee by user ID
         /// </summary>
         [HttpGet("by-user/{userId}")]
+        [Authorize(Policy = "RequireEmployee")] // Any employee can view employee details
         public async Task<ActionResult<Employee>> SelectEmployeeByUserId(Guid userId)
         {
             var employee = await _context.Employee
@@ -153,7 +159,7 @@ namespace SelfSampleProRAD_DB_API.Controller
                     Position = e.Position,
                     Salary = e.Salary,
                     Tax = e.Tax,
-                    Catagory = e.Catagory,
+                    Category = e.Category,
                     Account = e.Account
                 }).FirstOrDefaultAsync();
                 
@@ -167,6 +173,7 @@ namespace SelfSampleProRAD_DB_API.Controller
         /// List all developers
         /// </summary>
         [HttpGet("developers")]
+        [Authorize(Policy = "RequireEmployee")] // Any employee can view developers list
         public async Task<ActionResult<List<DevEmployeeResponseDTO>>> ListAllDevs()
         {
             var devs = await _context.Employee
@@ -184,6 +191,7 @@ namespace SelfSampleProRAD_DB_API.Controller
         /// List all employees
         /// </summary>
         [HttpGet]
+        [Authorize(Policy = "RequireAdmin")] // Only admins can list all employees
         public async Task<ActionResult<List<EmployeeResponseDTO>>> ListAllEmployees()
         {
             var employees = await _context.Employee
@@ -197,7 +205,7 @@ namespace SelfSampleProRAD_DB_API.Controller
                     Position = e.Position,
                     Salary = e.Salary,
                     Tax = e.Tax,
-                    Catagory = e.Catagory,
+                    Catagory = e.Category,
                     accountdto = new AccountResponseDTO
                     {
                         UserId = e.Account.UserId,

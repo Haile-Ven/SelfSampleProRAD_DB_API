@@ -1,4 +1,4 @@
-using SelfSampleProRAD_DB_API.Model;
+using SelfSampleProRAD_DB_API.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace SelfSampleProRAD_DB_API.Data

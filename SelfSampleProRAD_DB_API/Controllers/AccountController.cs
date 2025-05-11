@@ -1,21 +1,25 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SelfSampleProRAD_DB_API.DTOs;
-using SelfSampleProRAD_DB_API.Model;
+using SelfSampleProRAD_DB_API.Models;
 using SelfSampleProRAD_DB_API.Data;
+using SelfSampleProRAD_DB_API.Services;
+using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
 
-namespace SelfSampleProRAD_DB_API.Controller
+namespace SelfSampleProRAD_DB_API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     public class AccountController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly JwtService _jwtService;
 
-        public AccountController(AppDbContext context)
+        public AccountController(AppDbContext context, JwtService jwtService)
         {
             _context = context;
+            _jwtService = jwtService;
         }
 
         /// <summary>
@@ -38,6 +42,9 @@ namespace SelfSampleProRAD_DB_API.Controller
             if (accountEntity.Status == 'D') 
                 return BadRequest("Account is deactivated.");
 
+            // Generate JWT token
+            var token = _jwtService.GenerateToken(accountEntity.Employee, accountEntity);
+
             // Map to DTO
             var account = new EmployeeResponseDTO()
             {
@@ -49,7 +56,7 @@ namespace SelfSampleProRAD_DB_API.Controller
                 Position = accountEntity.Employee.Position,
                 Salary = accountEntity.Employee.Salary,
                 Tax = accountEntity.Employee.Tax,
-                Catagory = accountEntity.Employee.Catagory,
+                Catagory = accountEntity.Employee.Category,
                 accountdto = new AccountResponseDTO()
                 {
                     UserId = accountEntity.UserId,
@@ -58,13 +65,14 @@ namespace SelfSampleProRAD_DB_API.Controller
                 }
             };
 
-            return Ok(new { Data = account, Message = "Login Successful." });
+            return Ok(new { Data = account, Token = token, Message = "Login Successful." });
         }
 
         /// <summary>
         /// Change password for a user
         /// </summary>
         [HttpPost("change-password")]
+        [Authorize] // Any authenticated user can change their own password
         public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordDTO request)
         {
             try
@@ -88,6 +96,7 @@ namespace SelfSampleProRAD_DB_API.Controller
         /// List all accounts
         /// </summary>
         [HttpGet]
+        [Authorize(Policy = "RequireAdmin")] // Only admins can list all accounts
         public async Task<ActionResult<List<AccountResponseDTO>>> ListAllAccounts()
         {
             var accounts = await _context.Account
@@ -105,6 +114,7 @@ namespace SelfSampleProRAD_DB_API.Controller
         /// Find account by ID
         /// </summary>
         [HttpGet("{id}")]
+        [Authorize(Policy = "RequireManager")] // Only managers can view account details
         public async Task<ActionResult<Account>> FindAccountByID(Guid id)
         {
             var account = await _context.Account
@@ -126,6 +136,7 @@ namespace SelfSampleProRAD_DB_API.Controller
         /// Change account status (Activate/Deactivate)
         /// </summary>
         [HttpPut("{accId}/toggle-status")]
+        [Authorize(Policy = "RequireAdmin")] // Only admins can activate/deactivate accounts
         public async Task<ActionResult> ChangeAccountStatus(Guid accId)
         {
             var account = await _context.Account.Where(a => a.UserId == accId).FirstOrDefaultAsync();

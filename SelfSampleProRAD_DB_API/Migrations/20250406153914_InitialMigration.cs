@@ -50,7 +50,7 @@ namespace SelfSampleProRAD_DB_API.Migrations
                     Position = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Salary = table.Column<float>(type: "real", nullable: false),
                     Tax = table.Column<float>(type: "real", nullable: false),
-                    Catagory = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Category = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>

@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SelfSampleProRAD_DB_API.Model
+namespace SelfSampleProRAD_DB_API.Models
 {
     public class Employee
     {
@@ -24,7 +24,7 @@ namespace SelfSampleProRAD_DB_API.Model
         [Required]
         public float Tax { get; set; }
         [Required]
-        public string Catagory { get; set; }
+        public string Category { get; set; }
 
         public Guid? UserId { get; set; }
 
