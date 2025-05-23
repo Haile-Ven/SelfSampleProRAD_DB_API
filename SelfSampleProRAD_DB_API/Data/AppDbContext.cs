@@ -11,6 +11,7 @@ namespace SelfSampleProRAD_DB_API.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+<<<<<<< HEAD
             if (!optionsBuilder.IsConfigured)
             {
                 // This is only used for design-time tools like migrations
@@ -19,6 +20,11 @@ namespace SelfSampleProRAD_DB_API.Data
                 var sqlServerConnectionString = "Data Source=HAILE-VEN;Initial Catalog=EmployeeTaskDB;Integrated Security=True;Trust Server Certificate=True";
                 optionsBuilder.UseSqlServer(sqlServerConnectionString);
             }
+=======
+            // This method is only used for design-time tools like migrations
+            // when a connection isn't explicitly provided via DI
+            // The actual connection string is configured in Program.cs from appsettings.json
+>>>>>>> 4ef3201b027fcb642d4706a330b9bebfb8ee533f
         }
 
         public DbSet<Account> Account { get; set; }

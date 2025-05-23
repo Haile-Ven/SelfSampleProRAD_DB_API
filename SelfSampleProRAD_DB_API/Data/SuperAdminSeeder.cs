@@ -1,17 +1,20 @@
 using Microsoft.EntityFrameworkCore;
 using SelfSampleProRAD_DB_API.Models;
+using SelfSampleProRAD_DB_API.Services;
 namespace SelfSampleProRAD_DB_API.Data
 {
     public class SuperAdminSeeder
     {
         private readonly AppDbContext _context;
+        private readonly PasswordHashService _passwordHashService;
         // Define static GUIDs for the super admin
         private static readonly Guid SuperAdminEmployeeId = new Guid("11111111-1111-1111-1111-111111111111");
         private static readonly Guid SuperAdminUserId = new Guid("22222222-2222-2222-2222-222222222222");
 
-        public SuperAdminSeeder(AppDbContext context)
+        public SuperAdminSeeder(AppDbContext context, PasswordHashService passwordHashService)
         {
             _context = context;
+            _passwordHashService = passwordHashService;
         }
 
         public async Task SeedSuperAdminAsync()
@@ -44,7 +47,7 @@ namespace SelfSampleProRAD_DB_API.Data
                 {
                     UserId = SuperAdminUserId,  // Use the static UserId
                     UserName = superAdminUserName,
-                    Password = "p@55w0rd",
+                    Password = _passwordHashService.HashPassword("p@55w0rd"),
                     Status = 'A'
                 };
 
