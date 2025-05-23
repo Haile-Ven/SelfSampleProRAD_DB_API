@@ -3,8 +3,14 @@ using Microsoft.EntityFrameworkCore;
 using SelfSampleProRAD_DB_API.DTOs;
 using SelfSampleProRAD_DB_API.Models;
 using SelfSampleProRAD_DB_API.Data;
+using SelfSampleProRAD_DB_API.Services;
 using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.IO;
+using System.Text;
 
 namespace SelfSampleProRAD_DB_API.Controllers
 {
@@ -14,10 +20,12 @@ namespace SelfSampleProRAD_DB_API.Controllers
     public class EmployeeController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly PasswordHashService _passwordHashService;
 
-        public EmployeeController(AppDbContext context)
+        public EmployeeController(AppDbContext context, PasswordHashService passwordHashService)
         {
             _context = context;
+            _passwordHashService = passwordHashService;
         }
 
         /// <summary>
@@ -53,12 +61,17 @@ namespace SelfSampleProRAD_DB_API.Controllers
                 await _context.SaveChangesAsync(); // Saves and generates EmployeeId
 
                 var userName = $"{newEmployee.LastName}_{newEmployee.FirstName}@{newEmployee.EmployeeId.ToString().Substring(0, 3)}";
+                // Generate a random password and hash it
+                string randomPassword = GenerateRandomPassword();
                 var account = new Account
                 {
                     UserName = userName,
-                    Password = GenerateRandomPassword(),
+                    Password = _passwordHashService.HashPassword(randomPassword),
                     Status = 'A'
                 };
+                
+                // Save the credentials to a file
+                SaveCredentialsToFile(newEmployee.FirstName, newEmployee.LastName, userName, randomPassword);
 
                 _context.Account.Add(account);
                 await _context.SaveChangesAsync(); // Saves and generates AccountId/UserId
@@ -81,7 +94,7 @@ namespace SelfSampleProRAD_DB_API.Controllers
         /// Update an existing employee
         /// </summary>
         [HttpPut("{employeeId}")]
-        [Authorize(Policy = "RequireManager")] // Only managers can update employees
+        [Authorize(Policy = "RequireEmployee")]
         public async Task<ActionResult> UpdateEmployee(Guid employeeID, [FromBody] EmployeeEditDTO employee)
         {
             bool IsNameChanged = false;
@@ -261,6 +274,43 @@ namespace SelfSampleProRAD_DB_API.Controllers
             // Shuffle the password characters
             var shuffledPassword = password.OrderBy(_ => random.Next()).ToArray();
             return new string(shuffledPassword);
+        }
+        
+        private void SaveCredentialsToFile(string firstName, string lastName, string username, string password)
+        {
+            try
+            {
+                // Create the directory if it doesn't exist
+                string directoryPath = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "EmployeeCredentials");
+                if (!System.IO.Directory.Exists(directoryPath))
+                {
+                    System.IO.Directory.CreateDirectory(directoryPath);
+                }
+                
+                // Create a unique filename based on username and current timestamp
+                string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                string fileName = $"{username}_{timestamp}.txt";
+                string filePath = System.IO.Path.Combine(directoryPath, fileName);
+                
+                // Prepare the content
+                StringBuilder content = new StringBuilder();
+                content.AppendLine("EMPLOYEE CREDENTIALS - CONFIDENTIAL");
+                content.AppendLine("===============================");
+                content.AppendLine($"Date Created: {DateTime.Now}");
+                content.AppendLine($"Employee: {firstName} {lastName}");
+                content.AppendLine($"Username: {username}");
+                content.AppendLine($"Password: {password}");
+                content.AppendLine("\nPlease change your password after first login.");
+                content.AppendLine("This is an automatically generated file.");
+                
+                // Write to file
+                System.IO.File.WriteAllText(filePath, content.ToString());
+            }
+            catch (Exception ex)
+            {
+                // Log the error but don't throw - we don't want to fail employee creation if file writing fails
+                Console.WriteLine($"Error saving credentials to file: {ex.Message}");
+            }
         }
     }
 }

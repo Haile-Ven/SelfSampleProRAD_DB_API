@@ -66,12 +66,13 @@ namespace SelfSampleProRAD_DB_API.DTOs
         public Guid UserId { get; set; }
         public string UserName { get; set; }
         public char Status { get; set; }
+        public string FullName { get; set; }
     }
 
     public class DevEmployeeResponseDTO
     {
-        public Guid EmployeeID { get; internal set; }
-        public string FullName { get; internal set; }
+        public Guid EmployeeID { get; set; }
+        public string FullName { get; set; }
     }
 
     public class EmployeeResponseDTO
@@ -112,4 +113,11 @@ namespace SelfSampleProRAD_DB_API.DTOs
         public string Status { get; set; }
     }
 
+    public class CredentialDTO
+    {
+        public string DateCreated { get; set; }
+        public string Employee { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
+    }
 }

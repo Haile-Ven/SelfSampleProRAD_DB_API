@@ -71,11 +71,14 @@ namespace SelfSampleProRAD_DB_API
 
             // Add JWT Service
             builder.Services.AddScoped<JwtService>();
+            
+            // Add Password Hashing Service
+            builder.Services.AddScoped<PasswordHashService>();
 
-            // Add DbContext with explicit connection string to avoid environment variable override
-            var sqlServerConnectionString = "Data Source=HAILE-WORK;Initial Catalog=EmployeeTaskDB;Integrated Security=True;Encrypt=True;Trust Server Certificate=True";
+            // Add DbContext using project-specific connection string from appsettings.json
+            // Using a unique name to avoid conflicts with environment variables from other projects
             builder.Services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(sqlServerConnectionString));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("SelfSampleProRADConnection")));
             builder.Services.AddScoped<SuperAdminSeeder>();
 
             var app = builder.Build();

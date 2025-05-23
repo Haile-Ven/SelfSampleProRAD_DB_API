@@ -11,14 +11,9 @@ namespace SelfSampleProRAD_DB_API.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-                // This is only used for design-time tools like migrations
-                // when a connection isn't explicitly provided
-                // Explicitly use the SQL Server connection string to avoid environment variable override
-                var sqlServerConnectionString = "Data Source=HAILE-WORK;Initial Catalog=EmployeeTaskDB;Integrated Security=True;Encrypt=True;Trust Server Certificate=True";
-                optionsBuilder.UseSqlServer(sqlServerConnectionString);
-            }
+            // This method is only used for design-time tools like migrations
+            // when a connection isn't explicitly provided via DI
+            // The actual connection string is configured in Program.cs from appsettings.json
         }
 
         public DbSet<Account> Account { get; set; }
