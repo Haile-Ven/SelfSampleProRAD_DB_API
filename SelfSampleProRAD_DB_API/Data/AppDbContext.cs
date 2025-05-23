@@ -16,7 +16,7 @@ namespace SelfSampleProRAD_DB_API.Data
                 // This is only used for design-time tools like migrations
                 // when a connection isn't explicitly provided
                 // Explicitly use the SQL Server connection string to avoid environment variable override
-                var sqlServerConnectionString = "Data Source=HAILE-WORK;Initial Catalog=EmployeeTaskDB;Integrated Security=True;Encrypt=True;Trust Server Certificate=True";
+                var sqlServerConnectionString = "Data Source=HAILE-VEN;Initial Catalog=EmployeeTaskDB;Integrated Security=True;Trust Server Certificate=True";
                 optionsBuilder.UseSqlServer(sqlServerConnectionString);
             }
         }

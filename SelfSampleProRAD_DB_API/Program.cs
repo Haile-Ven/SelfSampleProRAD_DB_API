@@ -73,7 +73,7 @@ namespace SelfSampleProRAD_DB_API
             builder.Services.AddScoped<JwtService>();
 
             // Add DbContext with explicit connection string to avoid environment variable override
-            var sqlServerConnectionString = "Data Source=HAILE-WORK;Initial Catalog=EmployeeTaskDB;Integrated Security=True;Encrypt=True;Trust Server Certificate=True";
+            var sqlServerConnectionString = "Data Source=HAILE-VEN;Initial Catalog=EmployeeTaskDB;Integrated Security=True;Trust Server Certificate=True";
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(sqlServerConnectionString));
             builder.Services.AddScoped<SuperAdminSeeder>();
