@@ -100,7 +100,10 @@ namespace SelfSampleProRAD_DB_API.Controllers
             bool IsNameChanged = false;
             try
             {
-                var emp = await _context.Employee.Where(e => e.EmployeeId == employeeID).FirstOrDefaultAsync();
+                Guid employeeId = JwtService.ExtractEmployeeIDClaimsFromJWT(this.User, "employeeId"); // Extract employee ID from JWT claims
+                if (employeeId == Guid.Empty) return BadRequest("Invalid Employee ID.");
+
+                var emp = await _context.Employee.Where(e => e.EmployeeId == employeeId).FirstOrDefaultAsync();
                 if (emp == null) return NotFound("Employee not found.");
                 if (emp.FirstName == employee.FirstName || emp.LastName == employee.LastName) IsNameChanged = true;
                 emp.FirstName = employee.FirstName;
@@ -131,8 +134,11 @@ namespace SelfSampleProRAD_DB_API.Controllers
         [Authorize(Policy = "RequireEmployee")] // Any employee can view employee details
         public async Task<ActionResult<Employee>> SelectEmployee(Guid employeeId)
         {
+            Guid employeeID = JwtService.ExtractEmployeeIDClaimsFromJWT(this.User, "employeeId"); // Extract employee ID from JWT claims
+            if (employeeID == Guid.Empty) return BadRequest("Invalid Employee ID.");
+
             var employee = await _context.Employee
-                .Where(e => e.EmployeeId == employeeId)
+                .Where(e => e.EmployeeId == employeeID)
                 .Select(e => new Employee
                 {
                     EmployeeId = e.EmployeeId,
@@ -160,6 +166,9 @@ namespace SelfSampleProRAD_DB_API.Controllers
         [Authorize(Policy = "RequireEmployee")] // Any employee can view employee details
         public async Task<ActionResult<Employee>> SelectEmployeeByUserId(Guid userId)
         {
+            Guid employeeID = JwtService.ExtractEmployeeIDClaimsFromJWT(this.User, "userId"); // Extract user ID from JWT claims
+            if (employeeID == Guid.Empty) return BadRequest("Invalid Employee ID.");
+
             var employee = await _context.Employee
                 .Where(e => e.UserId == userId)
                 .Select(e => new Employee

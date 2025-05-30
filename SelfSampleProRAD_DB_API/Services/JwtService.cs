@@ -38,5 +38,12 @@ namespace SelfSampleProRAD_DB_API.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        public static Guid ExtractEmployeeIDClaimsFromJWT(ClaimsPrincipal User, string claimType)
+        {
+            string? employeeID = User.Claims.FirstOrDefault(c => c.Type == claimType)?.Value;
+            if (employeeID == null) return Guid.Empty;
+            return Guid.Parse(employeeID);
+        }
     }
 }
