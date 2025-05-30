@@ -4,6 +4,7 @@ using SelfSampleProRAD_DB_API.Models;
 using SelfSampleProRAD_DB_API.DTOs;
 using SelfSampleProRAD_DB_API.Data;
 using Microsoft.AspNetCore.Authorization;
+using SelfSampleProRAD_DB_API.Services;
 
 namespace SelfSampleProRAD_DB_API.Controllers
 {
@@ -27,6 +28,9 @@ namespace SelfSampleProRAD_DB_API.Controllers
             using var transaction = _context.Database.BeginTransaction();
             try
             {
+                Guid employeeId = JwtService.ExtractEmployeeIDClaimsFromJWT(this.User); // Extract employee ID from JWT claims
+                if (employeeId == Guid.Empty) return BadRequest("Invalid Employee ID.");
+
                 var task = new Tasks
                 {
                     TaskName = request.TaskName,
@@ -38,7 +42,7 @@ namespace SelfSampleProRAD_DB_API.Controllers
                 {
                     TaskId = taskResponse.Entity.TaskId,
                     AssignedToId = Guid.Parse(request.AssignedToId),
-                    AssignedById = Guid.Parse(request.AssignedById)
+                    AssignedById = employeeId
                 };
                 var employeeTaskResponse = _context.EmployeeTasks.Add(employeeTask);
                 await _context.SaveChangesAsync();
@@ -66,8 +70,11 @@ namespace SelfSampleProRAD_DB_API.Controllers
         {
             try
             {
+                Guid employeeId = JwtService.ExtractEmployeeIDClaimsFromJWT(this.User); // Extract employee ID from JWT claims
+                if (employeeId == Guid.Empty) return BadRequest("Invalid Employee ID.");
+
                 var tasks = await _context.EmployeeTasks
-                    .Where(t => t.AssignedToId == taskTo && t.Tasks.Status !='C')
+                    .Where(t => t.AssignedToId == employeeId && t.Tasks.Status !='C')
                     .Select(t => new TaskViewToResponseDTO
                     {
                         TaskId = t.TaskId,
@@ -94,8 +101,11 @@ namespace SelfSampleProRAD_DB_API.Controllers
         {
             try
             {
+                Guid employeeId = JwtService.ExtractEmployeeIDClaimsFromJWT(this.User); // Extract employee ID from JWT claims
+                if (employeeId == Guid.Empty) return BadRequest("Invalid Employee ID.");
+
                 var tasks = await _context.EmployeeTasks
-                    .Where(t => t.AssignedById == taskBy)
+                    .Where(t => t.AssignedById == employeeId)
                     .Select(t => new TaskViewByResponseDTO
                     {
                         FullName = $"{t.AssignedTo.FirstName} {t.AssignedTo.LastName}",
