@@ -78,7 +78,7 @@ namespace SelfSampleProRAD_DB_API.Controllers
         {
             try
             {
-                Guid employeeId = JwtService.ExtractEmployeeIDClaimsFromJWT(this.User); // Extract employee ID from JWT claims
+                Guid employeeId = JwtService.ExtractEmployeeIDClaimsFromJWT(this.User, "employeeId"); // Extract employee ID from JWT claims
                 if (employeeId == Guid.Empty) return BadRequest("Invalid Employee ID.");
 
                 var employee = await _context.Employee.Where(e => e.EmployeeId == employeeId).FirstOrDefaultAsync();

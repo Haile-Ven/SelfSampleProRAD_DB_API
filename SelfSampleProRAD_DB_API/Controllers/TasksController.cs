@@ -28,7 +28,7 @@ namespace SelfSampleProRAD_DB_API.Controllers
             using var transaction = _context.Database.BeginTransaction();
             try
             {
-                Guid employeeId = JwtService.ExtractEmployeeIDClaimsFromJWT(this.User); // Extract employee ID from JWT claims
+                Guid employeeId = JwtService.ExtractEmployeeIDClaimsFromJWT(this.User, "employeeId"); // Extract employee ID from JWT claims
                 if (employeeId == Guid.Empty) return BadRequest("Invalid Employee ID.");
 
                 var task = new Tasks
@@ -70,7 +70,7 @@ namespace SelfSampleProRAD_DB_API.Controllers
         {
             try
             {
-                Guid employeeId = JwtService.ExtractEmployeeIDClaimsFromJWT(this.User); // Extract employee ID from JWT claims
+                Guid employeeId = JwtService.ExtractEmployeeIDClaimsFromJWT(this.User, "employeeId"); // Extract employee ID from JWT claims
                 if (employeeId == Guid.Empty) return BadRequest("Invalid Employee ID.");
 
                 var tasks = await _context.EmployeeTasks
@@ -101,7 +101,7 @@ namespace SelfSampleProRAD_DB_API.Controllers
         {
             try
             {
-                Guid employeeId = JwtService.ExtractEmployeeIDClaimsFromJWT(this.User); // Extract employee ID from JWT claims
+                Guid employeeId = JwtService.ExtractEmployeeIDClaimsFromJWT(this.User, "employeeId"); // Extract employee ID from JWT claims
                 if (employeeId == Guid.Empty) return BadRequest("Invalid Employee ID.");
 
                 var tasks = await _context.EmployeeTasks
