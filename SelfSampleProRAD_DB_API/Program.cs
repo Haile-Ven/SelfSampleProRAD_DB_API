@@ -75,13 +75,8 @@ namespace SelfSampleProRAD_DB_API
             // Add Password Hashing Service
             builder.Services.AddScoped<PasswordHashService>();
 
-<<<<<<< HEAD
-            // Add DbContext with explicit connection string to avoid environment variable override
-            var sqlServerConnectionString = "Data Source=HAILE-VEN;Initial Catalog=EmployeeTaskDB;Integrated Security=True;Trust Server Certificate=True";
-=======
             // Add DbContext using project-specific connection string from appsettings.json
             // Using a unique name to avoid conflicts with environment variables from other projects
->>>>>>> 4ef3201b027fcb642d4706a330b9bebfb8ee533f
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("SelfSampleProRADConnection")));
             builder.Services.AddScoped<SuperAdminSeeder>();

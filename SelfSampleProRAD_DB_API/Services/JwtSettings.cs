@@ -1,4 +1,4 @@
-namespace SelfSampleProRAD_DB_API.Models
+namespace SelfSampleProRAD_DB_API.Services
 {
     public class JwtSettings
     {
