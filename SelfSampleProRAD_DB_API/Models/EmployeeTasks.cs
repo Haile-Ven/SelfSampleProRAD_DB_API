@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SelfSampleProRAD_DB_API.Models
 {
@@ -18,7 +17,6 @@ namespace SelfSampleProRAD_DB_API.Models
         [Required]
         public Guid AssignedById { get; set; }
 
-        // Navigation properties
         public virtual Employee AssignedTo { get; set; }
         public virtual Employee AssignedBy { get; set; }
         public virtual Tasks Tasks { get; set; }

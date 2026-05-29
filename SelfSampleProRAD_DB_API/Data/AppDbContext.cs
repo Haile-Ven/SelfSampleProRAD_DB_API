@@ -9,9 +9,6 @@ namespace SelfSampleProRAD_DB_API.Data
         {
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        { }
-
         public DbSet<Account> Account { get; set; }
         public DbSet<Employee> Employee { get; set; }
         public DbSet<Tasks> Tasks { get; set; }

@@ -4,7 +4,6 @@ namespace SelfSampleProRAD_DB_API.Models
 {
     public class Account
     {
-        //Auto-Properties
         [Key]
         [Required]
         public Guid UserId { get; set; }
@@ -15,10 +14,8 @@ namespace SelfSampleProRAD_DB_API.Models
         [Required]
         public char Status { get; set; }
 
-        // Navigation property
         public virtual Employee Employee { get; set; }
 
-        //Constructors
         public Account() { UserId = Guid.NewGuid(); }
     }
 }

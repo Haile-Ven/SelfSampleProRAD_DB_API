@@ -5,7 +5,6 @@ namespace SelfSampleProRAD_DB_API.Models
 {
     public class Employee
     {
-        //Auto-properties
         [Key]
         [Required]
         public Guid EmployeeId { get; set; }
@@ -28,12 +27,10 @@ namespace SelfSampleProRAD_DB_API.Models
 
         public Guid? UserId { get; set; }
 
-        // Navigation property
         [ForeignKey("UserId")]
         public virtual Account Account { get; set; }
         public virtual ICollection<EmployeeTasks> EmployeeTasks { get; set; }
         
-        //Constructors
         public Employee() { EmployeeId = Guid.NewGuid(); }
     }
 }

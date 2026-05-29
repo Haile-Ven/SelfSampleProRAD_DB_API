@@ -6,22 +6,18 @@ namespace SelfSampleProRAD_DB_API.Data
     public class SuperAdminSeeder
     {
         private readonly AppDbContext _context;
-        private readonly PasswordHashService _passwordHashService;
-        // Define static GUIDs for the super admin
-        private static readonly Guid SuperAdminEmployeeId = new Guid("11111111-1111-1111-1111-111111111111");
-        private static readonly Guid SuperAdminUserId = new Guid("22222222-2222-2222-2222-222222222222");
+        private static readonly Guid SuperAdminEmployeeId = new Guid("67f9b050-06e6-4e38-979f-0ae6441b809d");
+        private static readonly Guid SuperAdminUserId = new Guid("8f3c6011-5c48-40ba-a08d-2ddb43dfd61a");
 
-        public SuperAdminSeeder(AppDbContext context, PasswordHashService passwordHashService)
+        public SuperAdminSeeder(AppDbContext context)
         {
             _context = context;
-            _passwordHashService = passwordHashService;
         }
 
         public async Task SeedSuperAdminAsync()
         {
             var superAdminUserName = "Doe_John@111";
 
-            // Check if super admin exists by the static EmployeeId
             if (await _context.Employee.AnyAsync(e => e.EmployeeId == SuperAdminEmployeeId))
                 return;
 
@@ -29,7 +25,7 @@ namespace SelfSampleProRAD_DB_API.Data
             {
                 var employee = new Employee
                 {
-                    EmployeeId = SuperAdminEmployeeId,  // Use the static EmployeeId
+                    EmployeeId = SuperAdminEmployeeId,      
                     FirstName = "John",
                     LastName = "Doe",
                     Gender = 'M',
@@ -45,16 +41,15 @@ namespace SelfSampleProRAD_DB_API.Data
 
                 var account = new Account
                 {
-                    UserId = SuperAdminUserId,  // Use the static UserId
+                    UserId = SuperAdminUserId,      
                     UserName = superAdminUserName,
-                    Password = _passwordHashService.HashPassword("p@55w0rd"),
+                    Password = BCrypt.Net.BCrypt.EnhancedHashPassword("p@55w0rd"),
                     Status = 'A'
                 };
 
                 _context.Account.Add(account);
                 await _context.SaveChangesAsync();
 
-                // Now link the employee to the account
                 employee.UserId = account.UserId;
                 _context.Employee.Update(employee);
                 await _context.SaveChangesAsync();

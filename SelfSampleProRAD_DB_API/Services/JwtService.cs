@@ -26,7 +26,7 @@ namespace SelfSampleProRAD_DB_API.Services
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim("userId", account.UserId.ToString()),
                 new Claim("employeeId", employee.EmployeeId.ToString()),
-                new Claim(ClaimTypes.Role, employee.Position) // Using Position as the role
+                new Claim(ClaimTypes.Role, employee.Position)      
             };
 
             var token = new JwtSecurityToken(

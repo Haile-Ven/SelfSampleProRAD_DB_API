@@ -19,19 +19,16 @@ namespace SelfSampleProRAD_DB_API
                     options.JsonSerializerOptions.NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals;
                 });
 
-            // Configure Logging
             builder.Logging.ClearProviders();
             builder.Logging.AddConsole();
             builder.Logging.AddDebug();
             builder.Logging.SetMinimumLevel(LogLevel.Information);
-            // Disable EF Core query logging
             builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Query", LogLevel.Error);
             builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Error);
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            // Add CORS
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll",
@@ -44,10 +41,8 @@ namespace SelfSampleProRAD_DB_API
                     });
             });
 
-            // Add HttpContextAccessor
             builder.Services.AddHttpContextAccessor();
 
-            // Add JWT Authentication
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -63,27 +58,19 @@ namespace SelfSampleProRAD_DB_API
                     };
                 });
 
-            // Add Authorization Policies
             builder.Services.AddAuthorization(options =>
             {
                 AuthorizationPolicies.ConfigurePolicies(options);
             });
 
-            // Add JWT Service
             builder.Services.AddScoped<JwtService>();
             
-            // Add Password Hashing Service
-            builder.Services.AddScoped<PasswordHashService>();
-
-            // Add DbContext using project-specific connection string from appsettings.json
-            // Using a unique name to avoid conflicts with environment variables from other projects
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("SelfSampleProRADConnection")));
             builder.Services.AddScoped<SuperAdminSeeder>();
 
             var app = builder.Build();
 
-            // Seed the database
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
@@ -99,30 +86,25 @@ namespace SelfSampleProRAD_DB_API
                 }
             }
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
 
-            // Configure forwarded headers
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor |
                                  Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto
             });
 
-            // Only use HTTPS redirection if not running behind a proxy (like ngrok)
             if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ASPNETCORE_FORWARDEDHEADERS_ENABLED")))
             {
                 app.UseHttpsRedirection();
             }
 
-            // Use CORS before auth
             app.UseCors("AllowAll");
             
-            // Add authentication middleware before authorization
             app.UseAuthentication();
             app.UseAuthorization();
             
