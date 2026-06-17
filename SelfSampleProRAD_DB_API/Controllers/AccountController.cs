@@ -72,7 +72,10 @@ namespace SelfSampleProRAD_DB_API.Controllers
         {
             try
             {
-                var employee = await _context.Employee.Where(e => e.EmployeeId == request.EmployeeId).FirstOrDefaultAsync();
+                Guid employeeId = JwtService.ExtractEmployeeIDClaimsFromJWT(this.User, "employeeId"); // Extract employee ID from JWT claims
+                if (employeeId == Guid.Empty) return BadRequest("Invalid Employee ID.");
+
+                var employee = await _context.Employee.Where(e => e.EmployeeId == employeeId).FirstOrDefaultAsync();
                 var account = await _context.Account.Where(a => a.UserId == employee.UserId).FirstOrDefaultAsync();
                 if (account == null) return NotFound("Account not found.");
                 if (!BCrypt.Net.BCrypt.EnhancedVerify(request.OldPassword, account.Password)) return BadRequest("Old Password is incorrect.");
@@ -183,6 +186,5 @@ namespace SelfSampleProRAD_DB_API.Controllers
                 Console.WriteLine($"Error deleting credential files: {ex.Message}");
             }
         }
-
     }
 }
